@@ -1,41 +1,47 @@
-// src/App.tsx
-import { HashRouter as Router, Route, Routes } from 'react-router-dom'; // Alterado para HashRouter
-import Dashboard from './pages/Dashboard';
-import NotFound from './pages/NotFound';
-import { Toaster } from './components/ui/toaster';
-import { AuthProvider } from './contexts/AuthContext';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import Auth from './pages/Auth';
-import MembersPage from './pages/Members';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import RoleRoute from '@/components/auth/RoleRoute'
 
-const queryClient = new QueryClient();
+import Auth from '@/pages/Auth'
+import Dashboard from '@/pages/Dashboard'
+import Members from '@/pages/Members'
+import Reception from '@/pages/Reception'
 
-function App() {
+export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        {/* Usando HashRouter que é 100% compatível com GitHub Pages */}
-        <Router>
-          <Routes>
-            {/* A rota inicial agora é a de autenticação */}
-            <Route path="/" element={<Auth />} />
-            <Route path="/auth" element={<Auth />} />
+    <HashRouter>
+      <Routes>
+        {/* pública */}
+        <Route path="/auth" element={<Auth />} />
 
-            {/* Rotas protegidas */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/members" element={<MembersPage />} />
-            </Route>
+        {/* bloco autenticado */}
+        <Route element={<ProtectedRoute />}>
+          {/* home (dashboard) */}
+          <Route path="/" element={<Dashboard />} />
 
-            {/* Rota para página não encontrada */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
-      </AuthProvider>
-      <Toaster />
-    </QueryClientProvider>
-  );
+          {/* rotas permitidas a owner e employee */}
+          <Route element={<RoleRoute roles={['owner', 'employee']} />}>
+            <Route path="/reception" element={<Reception />} />
+            <Route path="/members" element={<Members />} />
+          </Route>
+
+          {/* rotas exclusivas de owner */}
+          <Route element={<RoleRoute roles={['owner']} />}>
+            <Route path="/plans" element={<div />} />
+            <Route path="/subscriptions" element={<div />} />
+            <Route path="/payments" element={<div />} />
+            <Route path="/classes" element={<div />} />
+            <Route path="/reports" element={<div />} />
+            <Route path="/settings" element={<div />} />
+          </Route>
+
+          {/* fallback dentro da área autenticada */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+
+        {/* fallback global (não autenticado cai para /auth) */}
+        <Route path="*" element={<Navigate to="/auth" replace />} />
+      </Routes>
+    </HashRouter>
+  )
 }
-
-export default App;
