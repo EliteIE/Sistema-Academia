@@ -1,28 +1,21 @@
-import { Sidebar } from "./sidebar"
-import { Header } from "./header"
+import { SidebarNav } from './sidebar'; // Corrigido de 'Sidebar' para 'SidebarNav'
+import { Header } from './header';
+import { Outlet } from 'react-router-dom';
 
-interface MainLayoutProps {
-  children: React.ReactNode
-  user?: {
-    name: string
-    email: string
-    avatar?: string
-    role: string
-  }
-}
-
-export function MainLayout({ children, user }: MainLayoutProps) {
+export function MainLayout({ children }: { children?: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
-        <Sidebar />
-        <div className="flex-1 flex flex-col">
-          <Header user={user} />
-          <main className="flex-1 p-6">
-            {children}
-          </main>
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      <div className="hidden border-r bg-muted/40 md:block">
+        <div className="flex h-full max-h-screen flex-col gap-2">
+          <SidebarNav />
         </div>
       </div>
+      <div className="flex flex-col">
+        <Header />
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          {children || <Outlet />}
+        </main>
+      </div>
     </div>
-  )
+  );
 }
