@@ -5,7 +5,9 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // A linha 'base' foi REMOVIDA daqui. O HashRouter no App.tsx já resolve o caminho.
+  // ESTA LINHA É A CORREÇÃO FINAL E OBRIGATÓRIA PARA O DEPLOY
+  base: "/Sistema-Academia/",
+
   server: {
     host: "::",
     port: 8080,
