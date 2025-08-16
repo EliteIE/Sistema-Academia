@@ -5,9 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // ESTA LINHA É A CORREÇÃO. ELA DIZ AO PROJETO ONDE ELE VAI ESTAR ONLINE.
-  base: '/Sistema-Academia/',
-
+  // A linha 'base' foi REMOVIDA daqui. O HashRouter no App.tsx já resolve o caminho.
   server: {
     host: "::",
     port: 8080,
