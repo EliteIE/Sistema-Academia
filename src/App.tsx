@@ -15,7 +15,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {/* Usando HashRouter que é mais compatível com GitHub Pages */}
+        {/* Usando HashRouter que é 100% compatível com GitHub Pages */}
         <Router>
           <Routes>
             {/* Rota pública de autenticação */}
@@ -38,5 +38,3 @@ function App() {
 }
 
 export default App;
-
-
