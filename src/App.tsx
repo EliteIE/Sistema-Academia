@@ -1,5 +1,5 @@
 // src/App.tsx
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom'; // Alterado para HashRouter
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 import { Toaster } from './components/ui/toaster';
@@ -15,8 +15,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {/* Adiciona o basename para funcionar no GitHub Pages */}
-        <Router basename="/Sistema-Academia/">
+        {/* Usando HashRouter que é mais compatível com GitHub Pages */}
+        <Router>
           <Routes>
             {/* Rota pública de autenticação */}
             <Route path="/auth" element={<Auth />} />
@@ -38,4 +38,5 @@ function App() {
 }
 
 export default App;
+
 
