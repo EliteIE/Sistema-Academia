@@ -18,12 +18,13 @@ function App() {
         {/* Usando HashRouter que é 100% compatível com GitHub Pages */}
         <Router>
           <Routes>
-            {/* Rota pública de autenticação */}
+            {/* A rota inicial agora é a de autenticação */}
+            <Route path="/" element={<Auth />} />
             <Route path="/auth" element={<Auth />} />
 
             {/* Rotas protegidas */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/members" element={<MembersPage />} />
             </Route>
 
