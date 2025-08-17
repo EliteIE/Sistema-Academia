@@ -1,47 +1,74 @@
+// src/App.tsx
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
-import ProtectedRoute from '@/components/auth/ProtectedRoute'
-import RoleRoute from '@/components/auth/RoleRoute'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import Auth from '@/pages/Auth'
 import Dashboard from '@/pages/Dashboard'
-import Members from '@/pages/Members'
 import Reception from '@/pages/Reception'
+import Members from '@/pages/Members'
+
+import ProtectedRoute from '@/components/auth/ProtectedRoute'
+import RoleRoute from '@/components/auth/RoleRoute'
+import MainLayout from '@/components/layout/main-layout'
+
+import { useProfile } from '@/hooks/useProfile'
+
+// Decide o destino quando o usuário acessa "/":
+// owner  -> /dashboard
+// employee -> /reception
+function HomeRouter() {
+  const { data: profile, isLoading } = useProfile()
+
+  if (isLoading) return null // pode trocar por um skeleton/spinner
+  if (!profile) return <Navigate to="/auth" replace />
+
+  return (
+    <Navigate
+      to={profile.role === 'owner' ? '/dashboard' : '/reception'}
+      replace
+    />
+  )
+}
+
+const queryClient = new QueryClient()
 
 export default function App() {
   return (
-    <HashRouter>
-      <Routes>
-        {/* pública */}
-        <Route path="/auth" element={<Auth />} />
+    <QueryClientProvider client={queryClient}>
+      <HashRouter>
+        <Routes>
+          {/* Pública */}
+          <Route path="/auth" element={<Auth />} />
 
-        {/* bloco autenticado */}
-        <Route element={<ProtectedRoute />}>
-          {/* home (dashboard) */}
-          <Route path="/" element={<Dashboard />} />
+          {/* Área protegida (precisa estar logado) */}
+          <Route path="/" element={<ProtectedRoute />}>
+            {/* Quando acessar exatamente "#/" decide para onde ir */}
+            <Route index element={<HomeRouter />} />
 
-          {/* rotas permitidas a owner e employee */}
-          <Route element={<RoleRoute roles={['owner', 'employee']} />}>
-            <Route path="/reception" element={<Reception />} />
-            <Route path="/members" element={<Members />} />
+            {/* Tudo que tem layout (Sidebar/Header + Outlet) */}
+            <Route element={<MainLayout />}>
+              {/* Rotas do DONO */}
+              <Route element={<RoleRoute roles={['owner']} />}>
+                <Route path="dashboard" element={<Dashboard />} />
+                {/* Ex.: outras rotas exclusivas do dono
+                <Route path="crm" element={<CRM />} />
+                <Route path="team" element={<Team />} />
+                <Route path="settings" element={<Settings />} />
+                */}
+              </Route>
+
+              {/* Rotas da RECEPÇÃO (employee) e também visíveis ao dono */}
+              <Route element={<RoleRoute roles={['employee', 'owner']} />}>
+                <Route path="reception" element={<Reception />} />
+                <Route path="members" element={<Members />} />
+              </Route>
+            </Route>
           </Route>
 
-          {/* rotas exclusivas de owner */}
-          <Route element={<RoleRoute roles={['owner']} />}>
-            <Route path="/plans" element={<div />} />
-            <Route path="/subscriptions" element={<div />} />
-            <Route path="/payments" element={<div />} />
-            <Route path="/classes" element={<div />} />
-            <Route path="/reports" element={<div />} />
-            <Route path="/settings" element={<div />} />
-          </Route>
-
-          {/* fallback dentro da área autenticada */}
+          {/* Qualquer rota desconhecida leva para "/" e o HomeRouter decide */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-
-        {/* fallback global (não autenticado cai para /auth) */}
-        <Route path="*" element={<Navigate to="/auth" replace />} />
-      </Routes>
-    </HashRouter>
+        </Routes>
+      </HashRouter>
+    </QueryClientProvider>
   )
 }

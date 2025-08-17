@@ -1,21 +1,28 @@
-import { SidebarNav } from './sidebar'; // Corrigido de 'Sidebar' para 'SidebarNav'
-import { Header } from './header';
-import { Outlet } from 'react-router-dom';
+// src/components/layout/main-layout.tsx
+import { Outlet } from 'react-router-dom'
 
-export function MainLayout({ children }: { children?: React.ReactNode }) {
+// ⬇️ Sidebar exporta default (como já deixamos no sidebar.tsx)
+import Sidebar from '@/components/layout/sidebar'
+
+// ⬇️ Header exporta **named** (ex.: `export function Header() { ... }`)
+import { Header } from '@/components/layout/header'
+
+export default function MainLayout() {
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <div className="hidden border-r bg-muted/40 md:block">
-        <div className="flex h-full max-h-screen flex-col gap-2">
-          <SidebarNav />
-        </div>
-      </div>
-      <div className="flex flex-col">
+    <div className="h-screen w-screen bg-neutral-950 text-neutral-100 flex">
+      {/* Lateral */}
+      <Sidebar />
+
+      {/* Coluna principal */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Topbar */}
         <Header />
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-          {children || <Outlet />}
+
+        {/* Conteúdo da rota */}
+        <main className="flex-1 overflow-auto p-4">
+          <Outlet />
         </main>
       </div>
     </div>
-  );
+  )
 }
